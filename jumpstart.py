@@ -5,17 +5,19 @@ Checks time and plays random music from a predefined folder.
 """
 
 import threading
-#import os
+import os
 import time
 import sys
+from subprocess import call
 
 
 class jumpstart(threading.Thread):
 	
-	def __init__(self, hour, minute):
+	def __init__(self, hour, minute, folder):
 		threading.Thread.__init__(self)
 		self.hour = hour
 		self.minute = minute
+		self.folder = folder
 
 
 	def run(self):
@@ -43,34 +45,48 @@ class jumpstart(threading.Thread):
 		else:
 			print "Not Yet..."
 
+	
+	def play_random(self, folder):
+		for file in os.listdir(folder):
+			if file.endswith(".mp3"):
+				print file
+
+	def play_music(self, music_file):
+		call(["afplay", music_file])
+
+
 def main():
+
+	#If file choose file
+	#If folder play random
+
 
 	if ((str(sys.argv[1]).isdigit()) and 
 		str(sys.argv[2]).isdigit()): 
 		
 		hours = int(str(sys.argv[1]))
 		minutes = int(str(sys.argv[2]))
+		folder = str(sys.argv[3])
 
 	else:
 		print "\033[1;31mError: Digits only\033[0m" 
-		print "Usage: jumpstart.py [hour] [minutes]"
+		print "Usage: jumpstart.py hour minutes folder|file"
 		print "\n"
 		sys.exit()
 
 	if (1 <= hours <= 24 and 
 		0 <= minutes <= 59):
 
-		alarmclock = jumpstart(hours,minutes)
+		alarmclock = jumpstart(hours,minutes,folder)
 
 		print "Your Alarm has been set for " + str(hours) + ":" + str(minutes)
+		alarmclock.play_music(folder)
 
-		alarmclock.start()
+		#alarmclock.start()
 	else:
 		print "\033[1;31mError: Time out of range\033[0m" 
 		print "Usage: jumpstart.py [hour] [minutes]"	
 		print "Usage ex: jumpstart.py 14 55"
-
-
 
 
 
