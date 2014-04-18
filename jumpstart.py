@@ -37,6 +37,7 @@ class jumpstart(threading.Thread):
 			self.current_minute == self.minute+1)):
 
 			print "Time to wake up!"
+			#play music file here
 			sys.exit()
 
 		else:
@@ -59,11 +60,11 @@ def main():
 	if (1 <= hours <= 24 and 
 		0 <= minutes <= 59):
 
-		#alarmclock = jumpstart(hours,minutes)
+		alarmclock = jumpstart(hours,minutes)
 
 		print "Your Alarm has been set for " + str(hours) + ":" + str(minutes)
 
-		#alarmclock.start()
+		alarmclock.start()
 	else:
 		print "\033[1;31mError: Time out of range\033[0m" 
 		print "Usage: jumpstart.py [hour] [minutes]"	
