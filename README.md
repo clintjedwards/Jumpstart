@@ -7,9 +7,11 @@ Alarm clock application that will check time and play random music file from pre
   - Uses [Time](https://docs.python.org/2/library/time.html) module
   - Uses/Requires [Afplay on Mac](https://developer.apple.com/library/mac/documentation/Darwin/Reference/Manpages/man1/afplay.1.html) binary
   - Command line tool: Usage: Jumpstart.py hour minutes path_to_file|folder
+  - Usage example: python jumpstart.py 14 55 ~/Music/mymusic.mp3 &
+  - **ONLY ACCEPTS MILITARY TIME** for now.
 
 > A small, quick project that I wanted to write for personal 
 > usefulness and the oppourtunity to work with threading
 > Takes hours and minutes in the form of military time and 
 > sets up an alarm clock to play a .mp3 file from a predefined
-> folder.
+> folder or file.

@@ -1,3 +1,5 @@
+#!/usr/bin/python
+
 """
 Alarm clock script
 
@@ -14,11 +16,11 @@ from subprocess import call
 
 class jumpstart(threading.Thread):
 	
-	def __init__(self, hour, minute, folder):
+	def __init__(self, hour, minute, music_source):
 		threading.Thread.__init__(self)
 		self.hour = hour
 		self.minute = minute
-		self.folder = folder
+		self.music_source = music_source
 
 
 	def run(self):
@@ -36,41 +38,43 @@ class jumpstart(threading.Thread):
 	def alarm(self):
 		if (self.current_hour == self.hour and 
 			(self.current_minute == self.minute or
-			self.current_minute == self.minute-1 or 
-			self.current_minute == self.minute+1)):
+			self.current_minute == self.minute+1 or 
+			self.current_minute == self.minute+2)):
 
 			print "Time to wake up!"
-			#play music file here
-			sys.exit()
 
-		else:
-			print "Not Yet..."
+			if os.path.isdir(self.music_source):
+				self.play_random(self.music_source)
+			
+			elif os.path.isfile(self.music_source):
+				self.play_music(self.music_source)
+			
+			else:
+				print "Not a valid file or folder"
+			
+			sys.exit()			
 
 	
-	def play_random(self, folder):
+	def play_random(self, music_source):
 		
 		music_files = []
 
-		for file in os.listdir(folder):
+		for file in os.listdir(music_source):
 			if file.endswith(".mp3"):
 				music_files.append(file)
 
 		randomized = random.randint(0, len(music_files)-1)
 
-		randomized_file = folder + music_files[randomized]
-		print randomized
-		print randomized_file
+		randomized_file = music_source + music_files[randomized]
 		self.play_music(randomized_file)
 
 
 	def play_music(self, music_file):
+		print "Playing: " + music_file
 		call(["afplay", music_file])
 
 
 def main():
-
-	#If file choose file
-	#If folder play random
 
 
 	if ((str(sys.argv[1]).isdigit()) and 
@@ -82,7 +86,7 @@ def main():
 
 	else:
 		print "\033[1;31mError: Digits only\033[0m" 
-		print "Usage: jumpstart.py hour minutes folder|file"
+		print "Usage: jumpstart.py hour minutes full_path_to_folder|file &"
 		print "\n"
 		sys.exit()
 
@@ -92,14 +96,14 @@ def main():
 		alarmclock = jumpstart(hours,minutes,music_source)
 
 		print "Your Alarm has been set for " + str(hours) + ":" + str(minutes)
-		#alarmclock.play_music(folder)
-		alarmclock.play_random(music_source)
 
-		#alarmclock.start()
+		alarmclock.start()
+		#alarmclock.alarm()
+
 	else:
 		print "\033[1;31mError: Time out of range\033[0m" 
-		print "Usage: jumpstart.py [hour] [minutes]"	
-		print "Usage ex: jumpstart.py 14 55"
+		print "Usage: jumpstart.py hour minutes full_path_to_folder|file &"	
+		print "Usage ex: jumpstart.py 14 55 ~/Music/mymusic.mp3"
 
 
 
