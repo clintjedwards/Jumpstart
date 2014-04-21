@@ -4,6 +4,9 @@
 Alarm clock script
 
 Checks time and plays random music from a predefined folder.
+
+Usage: jumpstart.py hour minutes full_path_to_folder|file &
+
 """
 
 import threading
@@ -95,7 +98,7 @@ def main():
 
 		alarmclock = jumpstart(hours,minutes,music_source)
 
-		print "Your Alarm has been set for " + str(hours) + ":" + str(minutes)
+		print "Your Alarm has been set for " + str(hours) + ":" + str(minutes).zfill(2)
 
 		alarmclock.start()
 		#alarmclock.alarm()
