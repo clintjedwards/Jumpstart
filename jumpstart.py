@@ -93,7 +93,7 @@ def main():
 		print "\n"
 		sys.exit()
 
-	if (1 <= hours <= 24 and 
+	if (0 <= hours <= 23 and 
 		0 <= minutes <= 59):
 
 		alarmclock = jumpstart(hours,minutes,music_source)
