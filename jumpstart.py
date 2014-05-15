@@ -25,7 +25,7 @@ class jumpstart(threading.Thread):
 		self.minute = minute
 		self.music_source = music_source
 
-
+	#Check to see if its time to alarm every 30 seconds
 	def run(self):
 
 		while(True):
@@ -37,7 +37,7 @@ class jumpstart(threading.Thread):
 			self.alarm()
 			time.sleep(60)
 			
-
+	#If current hour matches alarm hour take an action
 	def alarm(self):
 		if (self.current_hour == self.hour and 
 			(self.current_minute == self.minute or
@@ -57,7 +57,8 @@ class jumpstart(threading.Thread):
 			
 			sys.exit()			
 
-	
+	#When given a folder, search the folder for .mp3
+	# and play at random
 	def play_random(self, music_source):
 		
 		music_files = []
@@ -71,7 +72,7 @@ class jumpstart(threading.Thread):
 		randomized_file = music_source + music_files[randomized]
 		self.play_music(randomized_file)
 
-
+	#When file is given call local mac player and play 
 	def play_music(self, music_file):
 		print "Playing: " + music_file
 		call(["afplay", music_file])
@@ -79,7 +80,7 @@ class jumpstart(threading.Thread):
 
 def main():
 
-
+	#Sanity checks
 	if ((str(sys.argv[1]).isdigit()) and 
 		str(sys.argv[2]).isdigit()): 
 		
@@ -101,7 +102,7 @@ def main():
 		print "Your Alarm has been set for " + str(hours) + ":" + str(minutes).zfill(2)
 
 		alarmclock.start()
-		#alarmclock.alarm()
+		
 
 	else:
 		print "\033[1;31mError: Time out of range\033[0m" 
