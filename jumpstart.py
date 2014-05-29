@@ -63,6 +63,11 @@ class jumpstart(threading.Thread):
 		
 		music_files = []
 
+		#check if the directory has been ended with slash
+		#for easy appending
+		if music_source[-1] != '/':
+			music_source = music_source + '/'
+
 		for file in os.listdir(music_source):
 			if file.endswith(".mp3"):
 				music_files.append(file)
@@ -81,33 +86,37 @@ class jumpstart(threading.Thread):
 def main():
 
 	#Sanity checks
-	if ((str(sys.argv[1]).isdigit()) and 
-		str(sys.argv[2]).isdigit()): 
-		
-		hours = int(str(sys.argv[1]))
-		minutes = int(str(sys.argv[2]))
-		music_source = str(sys.argv[3])
-
-	else:
-		print "\033[1;31mError: Digits only\033[0m" 
+	if len(sys.argv) == 1:
 		print "Usage: jumpstart.py hour minutes full_path_to_folder|file &"
 		print "\n"
-		sys.exit()
+	else:
+		if ((str(sys.argv[1]).isdigit()) and 
+			str(sys.argv[2]).isdigit()): 
+		
+			hours = int(str(sys.argv[1]))
+			minutes = int(str(sys.argv[2]))
+			music_source = str(sys.argv[3])
 
-	if (0 <= hours <= 23 and 
-		0 <= minutes <= 59):
+		else:
+			print "\033[1;31mError: Digits only\033[0m" 
+			print "Usage: jumpstart.py hour minutes full_path_to_folder|file &"
+			print "\n"
+			sys.exit()
 
-		alarmclock = jumpstart(hours,minutes,music_source)
+		if (0 <= hours <= 23 and 
+			0 <= minutes <= 59):
 
-		print "Your Alarm has been set for " + str(hours) + ":" + str(minutes).zfill(2)
+			alarmclock = jumpstart(hours,minutes,music_source)
 
-		alarmclock.start()
+			print "Your Alarm has been set for " + str(hours) + ":" + str(minutes).zfill(2)
+
+			alarmclock.start()
 		
 
-	else:
-		print "\033[1;31mError: Time out of range\033[0m" 
-		print "Usage: jumpstart.py hour minutes full_path_to_folder|file &"	
-		print "Usage ex: jumpstart.py 14 55 ~/Music/mymusic.mp3"
+		else:
+			print "\033[1;31mError: Time out of range\033[0m" 
+			print "Usage: jumpstart.py hour minutes full_path_to_folder|file &"	
+			print "Usage ex: jumpstart.py 14 55 ~/Music/mymusic.mp3"
 
 
 
