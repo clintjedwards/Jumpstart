@@ -8,7 +8,7 @@ Alarm clock application that will check time and play random music file from pre
   - Uses [Argparse](https://docs.python.org/dev/library/argparse.html) module
   - Uses/Requires [Afplay on Mac](https://developer.apple.com/library/mac/documentation/Darwin/Reference/Manpages/man1/afplay.1.html) binary
 
-
+'''
 	usage: jumpstart.py [-h] [-12 TIME] [-24 TIME] [-r] [-c] [-m PATH]
 
 	JumpStart: The Command-Line AlarmClock
@@ -20,7 +20,7 @@ Alarm clock application that will check time and play random music file from pre
   	-r, --recent              View previous alarm settings
   	-c, --clear_recent        Clear previous alarm settings
   	-m PATH, --music PATH     Define music source(Path to file or folder)
-
+'''
 
 > A small, quick project that I wanted to write for personal 
 > usefulness and the oppourtunity to work with threading
