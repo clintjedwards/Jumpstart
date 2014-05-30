@@ -22,10 +22,10 @@ from subprocess import call
 class jumpstart(threading.Thread):
 
 	
-	def __init__(self, wake_time, music_source):
+	def __init__(self, wake_time):
 		threading.Thread.__init__(self)
 		self.wake_time = wake_time
-		self.music_source = music_source
+		self.music_source = None
 		self.current_hour = 0 
 		self.current_minute = 0 
 		self.wake_hour = 0 
@@ -47,7 +47,7 @@ class jumpstart(threading.Thread):
 			military_time = fully_transformed_time
 			
 		elif daytime == 'pm':
-			military_time = int(fully_transformed_time) + 1200
+			military_time = str(int(fully_transformed_time) + 1200)
 			
 		return military_time	
 	
@@ -77,19 +77,19 @@ class jumpstart(threading.Thread):
 			self.current_minute == self.wake_minute+2)):
 
 			print "Time to wake up!"
-			sys.exit()
-	"""
-			if os.path.isdir(self.music_source):
-				self.play_random(self.music_source)
+				
+			if self.music_source != None:	
+				if os.path.isdir(self.music_source):
+					self.play_random(self.music_source)
 			
-			elif os.path.isfile(self.music_source):
-				self.play_music(self.music_source)
+				elif os.path.isfile(self.music_source):
+					self.play_music(self.music_source)
 			
-			else:
-				print "Not a valid file or folder"
-			
+				else:
+					print "Not a valid file or folder"
+					
 			sys.exit()			
-	"""
+
 	#When given a folder, search the folder for .mp3
 	# and play at random
 	def play_random(self, music_source):
@@ -132,9 +132,7 @@ def main():
 	parser.add_argument('-c','--clear_recent', help="Clear previous alarm settings", required=False, action='store_true')
 	parser.add_argument('-m','--music', help="Define music source(Path to file or folder)", required=False, action='store', nargs=1, metavar='PATH')
 	args = parser.parse_args()
-	#print args
-	#print len(sys.argv)
-	#print args.music
+
 
 	if len(sys.argv) == 1:
 		print "The current time is " + time.strftime("%Y-%m-%d %H:%M:%S")
@@ -148,8 +146,13 @@ def main():
 		regex = re.compile("^(1[0-2]|0?[1-9]):([0-5]?[0-9])(am|pm)$")
 		
 		if regex.match("".join(args.standard).lower()):
-			alarmclock = jumpstart("".join(args.standard).lower(), args.music)
+			alarmclock = jumpstart("".join(args.standard).lower())
 			wake_time = alarmclock.convert_standard_time(alarmclock.wake_time)
+
+			if args.music:
+				alarmclock.music_source = "".join(args.music)
+				
+
 			alarmclock.run(wake_time)
 
 	#Military time
