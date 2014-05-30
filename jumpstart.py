@@ -5,7 +5,7 @@ Alarm clock script
 
 Checks time and plays random music from a predefined folder.
 
-Usage: jumpstart.py UPDATE
+usage: jumpstart.py [-h] [-12 TIME] [-24 TIME] [-r] [-c] [-m PATH]
 
 """
 
@@ -22,21 +22,25 @@ from subprocess import call
 class jumpstart(threading.Thread):
 
 	
-	def __init__(self, time, music_source):
+	def __init__(self, wake_time, music_source):
 		threading.Thread.__init__(self)
-		self.time = time
+		self.wake_time = wake_time
 		self.music_source = music_source
+		self.current_hour = 0 
+		self.current_minute = 0 
+		self.wake_hour = 0 
+		self.wake_minute = 0
 
-	def convert_standard_time(self, time):
+	def convert_standard_time(self, wake_time):
 		find_time = re.compile("^(1[0-2]|0?[1-9]):([0-5]?[0-9])")
 		
-		regex_result = find_time.search(time)
+		regex_result = find_time.search(wake_time)
 		truncated_time = regex_result.group(0)
 
 		fully_transformed_time = truncated_time.replace(":", "")
 
 		find_time = re.compile("(am|pm)$")
-		regex_result = find_time.search(time)
+		regex_result = find_time.search(wake_time)
 		daytime = regex_result.group(0)
 
 		if daytime == 'am':
@@ -49,7 +53,7 @@ class jumpstart(threading.Thread):
 	
 
 	#Check to see if its time to alarm every 30 seconds
-	def run(self):
+	def run(self, wake_time):
 
 		while(True):
 
@@ -57,18 +61,24 @@ class jumpstart(threading.Thread):
 			self.current_hour = ticks[3]
 			self.current_minute = ticks[4]
 
-			self.alarm()
+			self.alarm(wake_time)
 			time.sleep(60)
 			
 	#If current hour matches alarm hour take an action
-	def alarm(self):
-		if (self.current_hour == self.hour and 
-			(self.current_minute == self.minute or
-			self.current_minute == self.minute+1 or 
-			self.current_minute == self.minute+2)):
+	def alarm(self, wake_time):
+
+		self.wake_hour = int(wake_time[:2])
+		self.wake_minute = int(wake_time[2:])
+
+		
+		if (self.current_hour == self.wake_hour and 
+			(self.current_minute == self.wake_minute or
+			self.current_minute == self.wake_minute+1 or 
+			self.current_minute == self.wake_minute+2)):
 
 			print "Time to wake up!"
-
+			sys.exit()
+	"""
 			if os.path.isdir(self.music_source):
 				self.play_random(self.music_source)
 			
@@ -79,7 +89,7 @@ class jumpstart(threading.Thread):
 				print "Not a valid file or folder"
 			
 			sys.exit()			
-
+	"""
 	#When given a folder, search the folder for .mp3
 	# and play at random
 	def play_random(self, music_source):
@@ -139,7 +149,8 @@ def main():
 		
 		if regex.match("".join(args.standard).lower()):
 			alarmclock = jumpstart("".join(args.standard).lower(), args.music)
-			alarmclock.convert_standard_time(alarmclock.time)
+			wake_time = alarmclock.convert_standard_time(alarmclock.wake_time)
+			alarmclock.run(wake_time)
 
 	#Military time
 	if (args.standard 	  == None and
