@@ -1,7 +1,7 @@
 #!/usr/bin/python
 
 """
-Alarm clock script
+JumpStart: The Command-Line AlarmClock
 
 Checks time and plays random music from a predefined folder.
 
@@ -22,14 +22,14 @@ from subprocess import call
 class jumpstart(threading.Thread):
 
 	
-	def __init__(self, wake_time):
+	def __init__(self):
 		threading.Thread.__init__(self)
-		self.wake_time = wake_time
-		self.music_source = None
-		self.current_hour = 0 
-		self.current_minute = 0 
-		self.wake_hour = 0 
-		self.wake_minute = 0
+		self.wake_time = 0 		 #Time to Alarm
+		self.music_source = None #Music Path
+		self.current_hour = 0 	 #Current real-time(local) hour
+		self.current_minute = 0  #Current real-time(local) minute
+		self.wake_hour = 0       #Time to alarm hour
+		self.wake_minute = 0     #Time to alarm minute
 
 	def convert_standard_time(self, wake_time):
 		find_time = re.compile("^(1[0-2]|0?[1-9]):([0-5]?[0-9])")
@@ -79,16 +79,20 @@ class jumpstart(threading.Thread):
 			print "Time to wake up!"
 				
 			if self.music_source != None:	
-				if os.path.isdir(self.music_source):
-					self.play_random(self.music_source)
-			
-				elif os.path.isfile(self.music_source):
-					self.play_music(self.music_source)
-			
-				else:
-					print "Not a valid file or folder"
+				self.find_music(self.music_source)
 					
-			sys.exit()			
+			sys.exit()		
+
+	def find_music(self, music_source):
+		if os.path.isdir(music_source):
+			self.play_random(music_source)
+			
+		elif os.path.isfile(music_source):
+			self.play_music(music_source)
+			
+		else:
+			print "Not a valid file or folder"	
+
 
 	#When given a folder, search the folder for .mp3
 	# and play at random
@@ -108,6 +112,7 @@ class jumpstart(threading.Thread):
 		randomized = random.randint(0, len(music_files)-1)
 
 		randomized_file = music_source + music_files[randomized]
+
 		self.play_music(randomized_file)
 
 	#When file is given call local mac player and play 
@@ -127,7 +132,7 @@ def main():
 	"""
 	parser = argparse.ArgumentParser(description='JumpStart: The Command-Line AlarmClock')
 	parser.add_argument('-12','--standard', help="Use Standard Time in format: 4:23pm", required=False, action='store', nargs=1, metavar='TIME')
-	parser.add_argument('-24','--military', help="Use Military Time in format: 1523", required=False, action='store', nargs=1, metavar='TIME')
+	parser.add_argument('-24','--military', help="Use Military Time in format: 15:23", required=False, action='store', nargs=1, metavar='TIME')
 	parser.add_argument('-r','--recent', help="View previous alarm settings", required=False, action='store_true')
 	parser.add_argument('-c','--clear_recent', help="Clear previous alarm settings", required=False, action='store_true')
 	parser.add_argument('-m','--music', help="Define music source(Path to file or folder)", required=False, action='store', nargs=1, metavar='PATH')
@@ -137,78 +142,62 @@ def main():
 	if len(sys.argv) == 1:
 		print "The current time is " + time.strftime("%Y-%m-%d %H:%M:%S")
 
-	#Standard time
+	#=====Standard time=====
 	if (args.standard 	  != None and
-	    args.military 	  == None and
-	    args.clear_recent == False and
-	    args.recent 	  == False):
+	    args.military 	  == None):
 
 		regex = re.compile("^(1[0-2]|0?[1-9]):([0-5]?[0-9])(am|pm)$")
 		
 		if regex.match("".join(args.standard).lower()):
-			alarmclock = jumpstart("".join(args.standard).lower())
-			wake_time = alarmclock.convert_standard_time(alarmclock.wake_time)
+			alarmclock = jumpstart()
+			wake_time = alarmclock.convert_standard_time("".join(args.standard).lower())
+
+			print "Your Alarm is set for: " + "".join(args.standard)
 
 			if args.music:
 				alarmclock.music_source = "".join(args.music)
-				
+		
 
 			alarmclock.run(wake_time)
 
-	#Military time
+	#=====Military time=====
 	if (args.standard 	  == None and
-	    args.military 	  != None and
-	    args.clear_recent == False and
+	    args.military 	  != None):
+
+		
+		regex = re.compile("^([0-9]|0[0-9]|1[0-9]|2[0-3]):[0-5][0-9]$")
+		if regex.match("".join(args.military)):
+			alarmclock = jumpstart()
+
+			print "Your Alarm is set for: " + "".join(args.military)
+
+			if args.music:
+				alarmclock.music_source = "".join(args.music)
+
+
+			alarmclock.wake_time = str("".join(args.military)).replace(":", "")	
+			alarmclock.run(alarmclock.wake_time)
+	
+	#=====Clear stored times=====	
+	if (args.clear_recent == True and
 	    args.recent 	  == False):
 		pass
 
-		#alarmclock = jumpstart(time, music_source)
-		#print args.military
+	#=====View stored times=====
+	if (args.clear_recent == False and
+	    args.recent 	  == True):
+		pass
 
-"""
-	#Sanity checks
-	if len(sys.argv) == 1:
-		print "Usage: jumpstart.py hour minutes full_path_to_folder|file &"
-		print "\n"
-	else:
+	#=====Play music=====
+	if (args.standard 	  == None and
+	    args.military 	  == None and
+	    args.clear_recent == False and
+	    args.recent 	  == False and
+	    args.music 		  != None):
 
-		#Check to see that input is actually digits
-		if ((str(sys.argv[1]).isdigit()) and 
-			str(sys.argv[2]).isdigit()): 
-		
-			hours = int(str(sys.argv[1]))
-			minutes = int(str(sys.argv[2]))
-			music_source = str(sys.argv[3])
+		alarmclock = jumpstart()
+		alarmclock.find_music("".join(args.music))
 
-		else:
-			print "\033[1;31mError: Digits only\033[0m" 
-			print "Usage: jumpstart.py hour minutes full_path_to_folder|file &"
-			print "\n"
-			sys.exit()
 
-		#Check to see that input is between the right times
-		if (0 <= hours <= 23 and 
-			0 <= minutes <= 59):
-
-			#check to see if user wanted standard time
-			if sys.argv[3] == '-st':
-				alarmclock = jumpstart(hours,minutes,music_source)
-				alarmclock.use_standard_time = True
-				print alarmclock.use_standard_time
-			else:
-				alarmclock = jumpstart(hours,minutes,music_source)
-				print alarmclock.use_standard_time
-
-			print "Your Alarm has been set for " + str(hours).zfill(2) + ":" + str(minutes).zfill(2)
-
-			alarmclock.start()
-		
-
-		else:
-			print "\033[1;31mError: Time out of range\033[0m" 
-			print "Usage: jumpstart.py hour minutes full_path_to_folder|file &"	
-			print "Usage ex: jumpstart.py 14 55 ~/Music/mymusic.mp3"
-
-"""
 
 main() 
