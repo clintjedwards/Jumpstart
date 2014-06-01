@@ -16,6 +16,7 @@ import sys
 import random
 import argparse
 import re
+import pickle
 from subprocess import call
 
 
@@ -30,6 +31,19 @@ class jumpstart(threading.Thread):
 		self.current_minute = 0  #Current real-time(local) minute
 		self.wake_hour = 0       #Time to alarm hour
 		self.wake_minute = 0     #Time to alarm minute
+
+		if not os.path.isfile("times_storage"):
+
+			create_list = []
+			create_list.append("-12 12:00pm -m ~/Music")
+
+			storage = open ("times_storage", 'a')
+			storage.close()
+	
+			with open('times_storage', 'wb') as f: 
+				pickle.dump(create_list, f)
+
+
 
 	def convert_standard_time(self, wake_time):
 		find_time = re.compile("^(1[0-2]|0?[1-9]):([0-5]?[0-9])")
@@ -120,6 +134,26 @@ class jumpstart(threading.Thread):
 		print "Playing: " + music_file
 		call(["afplay", music_file])
 
+	def write_storage_file(self, time, music):
+		with open('times_storage', 'rb') as f: 
+				times_list = pickle.load(f)
+
+		if music != None:
+			times_list.append(time + music)
+		else:
+			times_list.append(time)
+
+		with open('times_storage', 'wb') as f: 
+			pickle.dump(times_list, f)
+
+	def read_storage_file(self):
+		with open('times_storage', 'rb') as f: 
+			times_list = pickle.load(f)
+
+			print ""
+			for item in times_list:
+				print str(times_list.index(item)+1) + ": "  + item
+
 
 def main():
 	
@@ -156,7 +190,6 @@ def main():
 
 			if args.music:
 				alarmclock.music_source = "".join(args.music)
-		
 
 			alarmclock.run(wake_time)
 
@@ -174,6 +207,10 @@ def main():
 			if args.music:
 				alarmclock.music_source = "".join(args.music)
 
+			if args.music:
+			 	alarmclock.write_storage_file("-24 " + "".join(args.military), "".join(args.music))
+			else:
+			 	alarmclock.write_storage_file("-24 " + "".join(args.military), None)
 
 			alarmclock.wake_time = str("".join(args.military)).replace(":", "")	
 			alarmclock.run(alarmclock.wake_time)
@@ -186,7 +223,9 @@ def main():
 	#=====View stored times=====
 	if (args.clear_recent == False and
 	    args.recent 	  == True):
-		pass
+
+		alarmclock = jumpstart()
+		alarmclock.read_storage_file()
 
 	#=====Play music=====
 	if (args.standard 	  == None and

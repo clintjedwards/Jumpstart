@@ -6,6 +6,7 @@ Alarm clock application that will check time and play random music file from pre
   - Uses [Threading](https://docs.python.org/2/library/threading.html) module
   - Uses [Time](https://docs.python.org/2/library/time.html)
   - Uses [Argparse](https://docs.python.org/dev/library/argparse.html) module
+  - Uses [Pickle]() module
   - Uses/Requires [Afplay on Mac](https://developer.apple.com/library/mac/documentation/Darwin/Reference/Manpages/man1/afplay.1.html) binary
 
 '''
