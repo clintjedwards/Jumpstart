@@ -139,7 +139,7 @@ class jumpstart(threading.Thread):
 				times_list = pickle.load(f)
 
 		if music != None:
-			times_list.append(time + music)
+			times_list.append(time + " -m " + music)
 		else:
 			times_list.append(time)
 
@@ -153,6 +153,12 @@ class jumpstart(threading.Thread):
 			print ""
 			for item in times_list:
 				print str(times_list.index(item)+1) + ": "  + item
+
+	def clear_storage_file(self):
+
+		if os.path.isfile("times_storage"):
+			os.remove("times_storage")
+		
 
 
 def main():
@@ -170,6 +176,7 @@ def main():
 	parser.add_argument('-r','--recent', help="View previous alarm settings", required=False, action='store_true')
 	parser.add_argument('-c','--clear_recent', help="Clear previous alarm settings", required=False, action='store_true')
 	parser.add_argument('-m','--music', help="Define music source(Path to file or folder)", required=False, action='store', nargs=1, metavar='PATH')
+	parser.add_argument('-s','--save', help="Save alarm configuration for future use", required=False, action='store_true')
 	args = parser.parse_args()
 
 
@@ -191,7 +198,7 @@ def main():
 			if args.music:
 				alarmclock.music_source = "".join(args.music)
 
-			if args.music:
+			if args.music and args.save:
 			 	alarmclock.write_storage_file("-12 " + "".join(args.standard), "".join(args.music))
 			else:
 			 	alarmclock.write_storage_file("-12 " + "".join(args.standard), None)
@@ -212,7 +219,7 @@ def main():
 			if args.music:
 				alarmclock.music_source = "".join(args.music)
 
-			if args.music:
+			if args.music and args.save:
 			 	alarmclock.write_storage_file("-24 " + "".join(args.military), "".join(args.music))
 			else:
 			 	alarmclock.write_storage_file("-24 " + "".join(args.military), None)
@@ -223,7 +230,10 @@ def main():
 	#=====Clear stored times=====	
 	if (args.clear_recent == True and
 	    args.recent 	  == False):
-		pass
+
+		alarmclock = jumpstart()
+		alarmclock.clear_storage_file()
+		
 
 	#=====View stored times=====
 	if (args.clear_recent == False and
