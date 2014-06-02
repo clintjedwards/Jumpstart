@@ -191,6 +191,11 @@ def main():
 			if args.music:
 				alarmclock.music_source = "".join(args.music)
 
+			if args.music:
+			 	alarmclock.write_storage_file("-12 " + "".join(args.standard), "".join(args.music))
+			else:
+			 	alarmclock.write_storage_file("-12 " + "".join(args.standard), None)
+
 			alarmclock.run(wake_time)
 
 	#=====Military time=====
