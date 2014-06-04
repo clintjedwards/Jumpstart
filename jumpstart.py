@@ -170,12 +170,12 @@ def main():
 	nargs=1 :: Make sure there is at least 1 other argument after this flag is set.
 	metavar :: Change the help screen to better relect what should be after the flag.
 	"""
-	parser = argparse.ArgumentParser(description='JumpStart: The Command-Line AlarmClock')
-	parser.add_argument('-12','--standard', help="Use Standard Time in format: 4:23pm", required=False, action='store', nargs=1, metavar='TIME')
-	parser.add_argument('-24','--military', help="Use Military Time in format: 15:23", required=False, action='store', nargs=1, metavar='TIME')
-	parser.add_argument('-r','--recent', help="View previous alarm settings", required=False, action='store_true')
+	parser = argparse.ArgumentParser(description='JumpStart: The Command-Line AlarmClock', formatter_class=lambda prog: argparse.HelpFormatter(prog,max_help_position=50))
+	parser.add_argument('-12','--standard', help="Use Standard Time in format: 4:23pm", required=False, action='store', nargs=1, metavar='<time>')
+	parser.add_argument('-24','--military', help="Use Military Time in format: 15:23", required=False, action='store', nargs=1, metavar='<time>')
+	parser.add_argument('-v','--view', help="View previous alarm settings", required=False, action='store_true')
 	parser.add_argument('-c','--clear_recent', help="Clear previous alarm settings", required=False, action='store_true')
-	parser.add_argument('-m','--music', help="Define music source(Path to file or folder)", required=False, action='store', nargs=1, metavar='PATH')
+	parser.add_argument('-m','--music', help="Define music source(Path to file or folder)", required=False, action='store', nargs=1, metavar='<path>')
 	parser.add_argument('-s','--save', help="Save alarm configuration for future use", required=False, action='store_true')
 	args = parser.parse_args()
 
@@ -200,7 +200,7 @@ def main():
 
 			if args.music and args.save:
 			 	alarmclock.write_storage_file("-12 " + "".join(args.standard), "".join(args.music))
-			else:
+			elif args.save:
 			 	alarmclock.write_storage_file("-12 " + "".join(args.standard), None)
 
 			alarmclock.run(wake_time)
@@ -221,7 +221,7 @@ def main():
 
 			if args.music and args.save:
 			 	alarmclock.write_storage_file("-24 " + "".join(args.military), "".join(args.music))
-			else:
+			elif args.save:
 			 	alarmclock.write_storage_file("-24 " + "".join(args.military), None)
 
 			alarmclock.wake_time = str("".join(args.military)).replace(":", "")	
@@ -229,7 +229,7 @@ def main():
 	
 	#=====Clear stored times=====	
 	if (args.clear_recent == True and
-	    args.recent 	  == False):
+	    args.view 	  == False):
 
 		alarmclock = jumpstart()
 		alarmclock.clear_storage_file()
@@ -237,16 +237,32 @@ def main():
 
 	#=====View stored times=====
 	if (args.clear_recent == False and
-	    args.recent 	  == True):
+	    args.view 	  == True):
 
 		alarmclock = jumpstart()
 		alarmclock.read_storage_file()
+
+
+		print ""
+		choice = raw_input("Use a previous configuration?[y/N]: ")
+
+		if choice.lower() == 'y': 
+			choice_number = raw_input("Choose desired configuration number: ")
+
+			with open('times_storage', 'rb') as f: 
+				times_list = pickle.load(f)
+
+			command = './jumpstart.py '  + str(times_list[int(choice_number)-1])
+
+			os.system(command)
+
+
 
 	#=====Play music=====
 	if (args.standard 	  == None and
 	    args.military 	  == None and
 	    args.clear_recent == False and
-	    args.recent 	  == False and
+	    args.view 	  	  == False and
 	    args.music 		  != None):
 
 		alarmclock = jumpstart()
