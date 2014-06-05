@@ -81,6 +81,8 @@ class jumpstart(threading.Thread):
 	#If current hour matches alarm hour take an action
 	def alarm(self, wake_time):
 
+		os.system("caffeinate &")
+
 		self.wake_hour = int(wake_time[:2])
 		self.wake_minute = int(wake_time[2:])
 
@@ -90,6 +92,8 @@ class jumpstart(threading.Thread):
 			self.current_minute == self.wake_minute+1 or 
 			self.current_minute == self.wake_minute+2)):
 
+			os.system("pkill caffeinate")
+			
 			print "Time to wake up!"
 				
 			if self.music_source != None:	
