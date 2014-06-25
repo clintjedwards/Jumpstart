@@ -22,27 +22,25 @@ from subprocess import call
 
 class jumpstart(threading.Thread):
 
-	
 	def __init__(self):
 		threading.Thread.__init__(self)
-		self.wake_time = 0 		 #Time to Alarm
-		self.music_source = None #Music Path
-		self.current_hour = 0 	 #Current real-time(local) hour
-		self.current_minute = 0  #Current real-time(local) minute
-		self.wake_hour = 0       #Time to alarm hour
-		self.wake_minute = 0     #Time to alarm minute
+		self.wake_time = 0 			#Time to Alarm
+		self.music_source = None 	#Music Path
+		self.current_hour = 0 		#Current real-time(local) hour
+		self.current_minute = 0 	#Current real-time(local) minute
+		self.wake_hour = 0 			#Time to alarm hour
+		self.wake_minute = 0 		#Time to alarm minute
 
 		if not os.path.isfile("times_storage"):
 
 			create_list = []
 			create_list.append("-12 12:00pm -m ~/Music")
 
-			storage = open ("times_storage", 'a')
+			storage = open("times_storage", 'a')
 			storage.close()
-	
-			with open('times_storage', 'wb') as f: 
-				pickle.dump(create_list, f)
 
+			with open('times_storage', 'wb') as f:
+				pickle.dump(create_list, f)
 
 
 	def convert_standard_time(self, wake_time):
@@ -63,7 +61,7 @@ class jumpstart(threading.Thread):
 		elif daytime == 'pm':
 			military_time = str(int(fully_transformed_time) + 1200)
 			
-		return military_time	
+		return military_time
 	
 
 	#Check to see if its time to alarm every 30 seconds
@@ -81,25 +79,22 @@ class jumpstart(threading.Thread):
 	#If current hour matches alarm hour take an action
 	def alarm(self, wake_time):
 
-		os.system("caffeinate &")
 
 		self.wake_hour = int(wake_time[:2])
 		self.wake_minute = int(wake_time[2:])
 
 		
-		if (self.current_hour == self.wake_hour and 
+		if (self.current_hour == self.wake_hour and
 			(self.current_minute == self.wake_minute or
-			self.current_minute == self.wake_minute+1 or 
+			self.current_minute == self.wake_minute+1 or
 			self.current_minute == self.wake_minute+2)):
-
-			os.system("pkill caffeinate")
 			
 			print "Time to wake up!"
 				
-			if self.music_source != None:	
+			if self.music_source != None:
 				self.find_music(self.music_source)
 					
-			sys.exit()		
+			sys.exit()
 
 	def find_music(self, music_source):
 		if os.path.isdir(music_source):
@@ -109,7 +104,7 @@ class jumpstart(threading.Thread):
 			self.play_music(music_source)
 			
 		else:
-			print "Not a valid file or folder"	
+			print "Not a valid file or folder"
 
 
 	#When given a folder, search the folder for .mp3
@@ -133,13 +128,13 @@ class jumpstart(threading.Thread):
 
 		self.play_music(randomized_file)
 
-	#When file is given call local mac player and play 
+	#When file is given call local mac player and play
 	def play_music(self, music_file):
 		print "Playing: " + music_file
 		call(["afplay", music_file])
 
 	def write_storage_file(self, time, music):
-		with open('times_storage', 'rb') as f: 
+		with open('times_storage', 'rb') as f:
 				times_list = pickle.load(f)
 
 		if music != None:
@@ -147,11 +142,11 @@ class jumpstart(threading.Thread):
 		else:
 			times_list.append(time)
 
-		with open('times_storage', 'wb') as f: 
+		with open('times_storage', 'wb') as f:
 			pickle.dump(times_list, f)
 
 	def read_storage_file(self):
-		with open('times_storage', 'rb') as f: 
+		with open('times_storage', 'rb') as f:
 			times_list = pickle.load(f)
 
 			print ""
@@ -228,10 +223,10 @@ def main():
 			elif args.save:
 			 	alarmclock.write_storage_file("-24 " + "".join(args.military), None)
 
-			alarmclock.wake_time = str("".join(args.military)).replace(":", "")	
+			alarmclock.wake_time = str("".join(args.military)).replace(":", "")
 			alarmclock.run(alarmclock.wake_time)
 	
-	#=====Clear stored times=====	
+	#=====Clear stored times=====
 	if (args.clear_recent == True and
 	    args.view 	  == False):
 
@@ -250,10 +245,10 @@ def main():
 		print ""
 		choice = raw_input("Use a previous configuration?[y/N]: ")
 
-		if choice.lower() == 'y': 
+		if choice.lower() == 'y':
 			choice_number = raw_input("Choose desired configuration number: ")
 
-			with open('times_storage', 'rb') as f: 
+			with open('times_storage', 'rb') as f:
 				times_list = pickle.load(f)
 
 			command = './jumpstart.py '  + str(times_list[int(choice_number)-1])
@@ -274,4 +269,4 @@ def main():
 
 
 
-main() 
+main()
